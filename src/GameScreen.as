@@ -20,7 +20,7 @@ package
 			FlxG.bgColor = 0xff808080;
 			FlxG.flash(0xff000000, 0.5);
 			
-			add(new Entity(50, 50));
+			add(new Bird(64, 128));
 		}
 		
 		override public function update():void

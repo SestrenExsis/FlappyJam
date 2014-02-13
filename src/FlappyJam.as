@@ -7,7 +7,7 @@ package
 	{
 		public function FlappyJam()
 		{
-			super(320, 180, GameScreen, 2.0, 60, 60, true);
+			super(640, 240, GameScreen, 1.0, 60, 60, true);
 			forceDebugger = true;
 		}
 	}

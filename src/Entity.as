@@ -7,20 +7,19 @@ package
 	import org.flixel.*;
 	
 	public class Entity extends FlxSprite
-	{	
-		[Embed(source="../assets/images/bird.png")] protected var imgBird:Class;
-
+	{
+		public var z:Number = 0;
+		public var velocityZ:Number = 0;
+		public var accelerationZ:Number = 0;
+		
 		public var gravity:Number = 800;
+		public var lane:int = 0;
 		
 		protected var _position:FlxPoint;
 		
 		public function Entity(X:Number, Y:Number)
 		{
 			super(X, Y);
-			
-			loadGraphic(imgBird, true, false, 32, 24);
-			addAnimation("flap", [0,1], 2, true);
-			play("flap");
 			
 			_position = new FlxPoint();
 		}
@@ -40,12 +39,35 @@ package
 		override public function update():void
 		{	
 			super.update();
+			
+			if (z <= 0)
+			{
+				z = 0;
+				velocityZ = 0;
+			}
+			else
+			{
+				velocityZ -= gravity * FlxG.elapsed;
+			}
+			
+			offset.y = z;
+		}
+		
+		override protected function updateMotion():void
+		{
+			super.updateMotion();
+			
+			// Add the z-axis to our calculations.
+			var velocityDelta:Number = (FlxU.computeVelocity(velocityZ, accelerationZ, 0, 10000) - velocityZ)/2;
+			velocityZ += velocityDelta;
+			var delta:Number = velocityZ*FlxG.elapsed;
+			velocityZ += velocityDelta;
+			z += delta;
 		}
 		
 		override public function destroy():void
 		{
 			super.destroy();
-			
 		}
 		
 		override public function draw():void
