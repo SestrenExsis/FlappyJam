@@ -4,7 +4,8 @@ package
 	
 	public class GameScreen extends FlxState
 	{
-		
+		[Embed(source="../assets/images/background.png")] protected var imgBackground:Class;
+
 		public static var overlay:FlxSprite;
 		public static var infoTextBackdrop:FlxSprite;
 		public static var infoText:FlxText;
@@ -17,8 +18,12 @@ package
 		override public function create():void
 		{
 			super.create();
-			FlxG.bgColor = 0xff808080;
 			FlxG.flash(0xff000000, 0.5);
+			
+			FlxG.bgColor = 0xff808080;
+			overlay = new FlxSprite();
+			overlay.loadGraphic(imgBackground);
+			add(overlay);
 			
 			add(new Bird(64, 128));
 		}

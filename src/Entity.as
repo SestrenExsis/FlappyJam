@@ -11,9 +11,7 @@ package
 		public var z:Number = 0;
 		public var velocityZ:Number = 0;
 		public var accelerationZ:Number = 0;
-		
 		public var gravity:Number = 800;
-		public var lane:int = 0;
 		
 		protected var _position:FlxPoint;
 		
