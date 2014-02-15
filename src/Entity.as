@@ -29,10 +29,10 @@ package
 			return _position;
 		}
 		
-		override public function reset(X:Number, Y:Number):void
+		/*override public function reset(X:Number, Y:Number):void
 		{
 			super.reset(X - width / 2, Y - height / 2);
-		}
+		}*/
 		
 		override public function update():void
 		{	

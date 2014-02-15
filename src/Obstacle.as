@@ -11,16 +11,20 @@ package
 		[Embed(source="../assets/images/obstacles.png")] protected var imgObstacles:Class;
 		
 		public static const NONE:int = 0;
-		public static const SHORT_BOTH:int = 1;
-		public static const SHORT_BOTTOM:int = 2;
-		public static const SHORT_TOP:int = 3;
-		public static const TALL_BOTTOM:int = 2;
-		public static const TALL_TOP:int = 3;
+		public static const SHORT:int = 1;
+		public static const TALL:int = 2;
 		
-		public static const animations:Array = ["none","short_both","short_bottom","short_top","tall_bottom","tall_top"];
+		public static const animations:Array = ["none","short_bottom","tall_bottom","short_top","short_both","none","tall_top","none","none"];
 		
-		protected var _type:int;
-		public var heightZ:Number = 0;
+		public static const SHORT_PIPE_Z:Number = 24;
+		public static const TALL_PIPE_Z:Number = 55;
+		
+		public static const TOP_PIPE_RECT:FlxRect = new FlxRect(0, 54, 32, 16);
+		public static const BOTTOM_PIPE_RECT:FlxRect = new FlxRect(10, 70, 32, 16);
+		
+		protected var _type:int = 0;
+		protected var _topType:int = 0;
+		protected var _bottomType:int = 0;
 		
 		public function Obstacle(X:Number, Y:Number)
 		{
@@ -35,21 +39,72 @@ package
 			addAnimation("tall_top", [5]);
 		}
 		
-		public function set type(Value:int):void
-		{
-			_type = Value;
-			play(animations[_type]);
-			
-		}
-		
 		public function get type():int
 		{
 			return _type;
 		}
 		
+		public function set type(Value:int):void
+		{
+			_type = Value;
+			_topType = _type / 3;
+			_bottomType = _type % 3;
+			play(animations[_type]);
+		}
+		
+		public function get topType():int
+		{
+			return _topType;
+		}
+		
+		public function set topType(Value:int):void
+		{
+			_topType = Value;
+			_type = 3 * _topType + _bottomType;;
+			play(animations[_type]);
+		}
+		
+		public function get bottomType():int
+		{
+			return _bottomType;
+		}
+		
+		public function set bottomType(Value:int):void
+		{
+			_bottomType = Value;
+			_type = 3 * _topType + _bottomType;;
+			play(animations[_type]);
+		}
+		
+		public function respawn():void
+		{
+			reset(FlxG.width - width, 68 + 12);
+			var _seed:Number = FlxG.random();
+			
+			//"none","short_bottom","tall_bottom","short_top","short_both","none","tall_top","none","none"
+			if (_seed < 0.75)
+				type = 0;
+			else if (_seed < 0.8)
+				type = 1;
+			else if (_seed < 0.85)
+				type = 2;
+			else if (_seed < 0.9)
+				type = 3;
+			else if (_seed < 0.95)
+				type = 4;
+			else
+				type = 6;
+			
+			velocity.x = -400;
+			FlxG.log(type);
+		}
+		
 		override public function update():void
 		{	
 			super.update();
+			
+			if (x + width < 0)
+				kill();
 		}
 		
 		override public function draw():void
