@@ -10,8 +10,12 @@ package
 	{	
 		[Embed(source="../assets/images/bird.png")] protected var imgBird:Class;
 		
-		public static const TOP_LANE:FlxPoint = new FlxPoint(64, 120);
-		public static const BOTTOM_LANE:FlxPoint = new FlxPoint(86, 156);
+		//public static const TOP_PIPE_RECT:FlxRect = new FlxRect(0, 54, 32, 16);
+		//public static const BOTTOM_PIPE_RECT:FlxRect = new FlxRect(10, 70, 32, 16);
+		//reset(FlxG.width, 80);
+		
+		public static const TOP_LANE:FlxPoint = new FlxPoint(76, 134 + 2);
+		public static const BOTTOM_LANE:FlxPoint = new FlxPoint(86, 150 + 2);
 		
 		protected var _bob:Number = 0;
 		protected var _bobSpeed:Number = 6;
@@ -81,7 +85,7 @@ package
 			offset.y += 24 + 0.5 * _bobAmount + _bobAmount * Math.cos(bob);
 			
 			if (z <= 0 && (FlxG.mouse.justPressed() || FlxG.keys.justPressed("UP")))
-				velocityZ += 300;
+				velocityZ += BIRD_JUMP_SPEED;
 			
 			if (FlxG.keys.justPressed("DOWN"))
 				switchLane();

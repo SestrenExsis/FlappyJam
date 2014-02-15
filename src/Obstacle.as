@@ -78,24 +78,24 @@ package
 		
 		public function respawn():void
 		{
-			reset(FlxG.width - width, 68 + 12);
+			reset(FlxG.width, 80);
 			var _seed:Number = FlxG.random();
 			
 			//"none","short_bottom","tall_bottom","short_top","short_both","none","tall_top","none","none"
-			if (_seed < 0.75)
+			if (_seed < 0.5)
 				type = 0;
-			else if (_seed < 0.8)
+			else if (_seed < 0.6)
 				type = 1;
-			else if (_seed < 0.85)
+			else if (_seed < 0.7)
 				type = 2;
-			else if (_seed < 0.9)
+			else if (_seed < 0.8)
 				type = 3;
-			else if (_seed < 0.95)
+			else if (_seed < 0.9)
 				type = 4;
 			else
 				type = 6;
 			
-			velocity.x = -400;
+			velocity.x = -PIPE_MOVE_SPEED;
 			FlxG.log(type);
 		}
 		
@@ -110,6 +110,20 @@ package
 		override public function draw():void
 		{
 			super.draw();
+			
+			// Draw hitboxes
+			/*_flashRect.x = TOP_PIPE_RECT.x + x;
+			_flashRect.y = TOP_PIPE_RECT.y + y;
+			_flashRect.width = TOP_PIPE_RECT.width;
+			_flashRect.height = TOP_PIPE_RECT.height;
+			FlxG.camera.buffer.fillRect(_flashRect, 0xffffffff);
+			
+			_flashRect.x = BOTTOM_PIPE_RECT.x + x;
+			_flashRect.y = BOTTOM_PIPE_RECT.y + y;
+			_flashRect.width = BOTTOM_PIPE_RECT.width;
+			_flashRect.height = BOTTOM_PIPE_RECT.height;
+			
+			FlxG.camera.buffer.fillRect(_flashRect, 0xffffffff);*/
 		}
 	}
 }

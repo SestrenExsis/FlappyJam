@@ -1,19 +1,14 @@
 package
 {
 	import org.flixel.*;
+	import flash.geom.Rectangle;
 	
 	public class GameScreen extends FlxState
 	{
-		[Embed(source="../assets/images/background.png")] protected var imgBackground:Class;
-
-		public var overlay:FlxSprite;
-		public var infoTextBackdrop:FlxSprite;
-		public var infoText:FlxText;
-		public var spawnTimer:FlxTimer;
-		
 		public var bird:Bird;
 		public var obstacles:FlxGroup;
 		
+		public var spawnTimer:FlxTimer;
 		private var hitboxRect:FlxRect;
 		
 		public function GameScreen()
@@ -29,9 +24,13 @@ package
 			hitboxRect = new FlxRect();
 			
 			FlxG.bgColor = 0xff808080;
-			overlay = new FlxSprite();
-			overlay.loadGraphic(imgBackground);
-			add(overlay);
+			
+			var _rect:Rectangle = new Rectangle(0, 0, 640, 131);
+			add(new ScrollingSprite(0, 0, _rect, 0.5, 0));
+			_rect.setTo(0, 131, 640, 38);
+			add(new ScrollingSprite(0, 131, _rect, 6, 0));
+			_rect.setTo(0, 169, 640, 71);
+			add(new ScrollingSprite(0, 169, _rect, 18, 0));
 			
 			bird = new Bird(Bird.TOP_LANE.x, Bird.TOP_LANE.y);
 			add(bird);

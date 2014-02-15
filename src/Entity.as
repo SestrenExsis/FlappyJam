@@ -2,16 +2,18 @@ package
 {
 	import flash.display.GradientType;
 	import flash.display.Graphics;
-	import flash.geom.Matrix;
 	
 	import org.flixel.*;
 	
 	public class Entity extends FlxSprite
 	{
+		public static const BIRD_JUMP_SPEED:Number = 300;
+		public static const PIPE_MOVE_SPEED:Number = 360;
+		
 		public var z:Number = 0;
 		public var velocityZ:Number = 0;
 		public var accelerationZ:Number = 0;
-		public var gravity:Number = 800;
+		public var gravity:Number = 1000;
 		
 		protected var _position:FlxPoint;
 		
