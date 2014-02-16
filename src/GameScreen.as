@@ -6,7 +6,7 @@ package
 	public class GameScreen extends FlxState
 	{
 		public var bird:Bird;
-		public var obstacles:FlxGroup;
+		public var entities:FlxGroup;
 		
 		public var spawnTimer:FlxTimer;
 		private var hitboxRect:FlxRect;
@@ -26,24 +26,23 @@ package
 			FlxG.bgColor = 0xff808080;
 			
 			var _rect:Rectangle = new Rectangle(0, 0, 640, 131);
-			add(new ScrollingSprite(0, 0, _rect, 0.5, 0));
+			add(new ScrollingSprite(0, 0, _rect, Entity.SKY_SPEED, 0));
 			_rect.setTo(0, 131, 640, 38);
-			add(new ScrollingSprite(0, 131, _rect, 6, 0));
+			add(new ScrollingSprite(0, 131, _rect, Entity.GROUND_SPEED, 0));
 			_rect.setTo(0, 169, 640, 71);
-			add(new ScrollingSprite(0, 169, _rect, 18, 0));
-			
-			bird = new Bird(Bird.TOP_LANE.x, Bird.TOP_LANE.y);
-			add(bird);
+			add(new ScrollingSprite(0, 169, _rect, Entity.FOREGROUND_SPEED, 0));
 			
 			var _obstacle:Obstacle;
-			obstacles = new FlxGroup();
+			entities = new FlxGroup();
 			for (var i:int = 0; i < 30; i++)
 			{
 				_obstacle = new Obstacle(-1000, -1000);
 				_obstacle.kill();
-				obstacles.add(_obstacle);
+				entities.add(_obstacle);
 			}
-			add(obstacles);
+			bird = new Bird(Bird.TOP_LANE.x, Bird.TOP_LANE.y);
+			entities.add(bird);
+			add(entities);
 			
 			spawnTimer = new FlxTimer();
 			spawnTimer.start(2, 1, nextObstacle);
@@ -52,7 +51,9 @@ package
 		override public function update():void
 		{	
 			super.update();
-			FlxG.overlap(obstacles, bird, hitTest);
+			FlxG.overlap(entities, bird, hitTest);
+			
+			entities.sort("layer", ASCENDING);
 		}
 		
 		public function hitTest(Object1:FlxObject, Object2:FlxObject):Boolean
@@ -89,13 +90,13 @@ package
 		
 		public function nextObstacle(Timer:FlxTimer):void
 		{
-			var _obstacle:Obstacle = Obstacle(obstacles.getFirstAvailable(Obstacle));
+			var _obstacle:Obstacle = Obstacle(entities.getFirstAvailable(Obstacle));
 			if (_obstacle)
 			{
 				_obstacle.respawn();
 			}
 			
-			Timer.start(0.5, 1, nextObstacle);
+			Timer.start(Entity.PIPE_SPAWN_COOLDOWN, 1, nextObstacle);
 		}
 		
 		public static function playRandomSound(Sounds:Array, VolumeMultiplier:Number = 1.0):void

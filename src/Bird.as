@@ -10,17 +10,14 @@ package
 	{	
 		[Embed(source="../assets/images/bird.png")] protected var imgBird:Class;
 		
-		//public static const TOP_PIPE_RECT:FlxRect = new FlxRect(0, 54, 32, 16);
-		//public static const BOTTOM_PIPE_RECT:FlxRect = new FlxRect(10, 70, 32, 16);
-		//reset(FlxG.width, 80);
-		
 		public static const TOP_LANE:FlxPoint = new FlxPoint(76, 134 + 2);
 		public static const BOTTOM_LANE:FlxPoint = new FlxPoint(86, 150 + 2);
 		
 		protected var _bob:Number = 0;
 		protected var _bobSpeed:Number = 6;
 		protected var _bobAmount:Number = 6;
-		protected var _lane:Number = 0;
+		
+		private var dying:Boolean = false;
 		
 		public function Bird(X:Number, Y:Number)
 		{
@@ -28,6 +25,7 @@ package
 			
 			loadGraphic(imgBird, true, false, 32, 24);
 			addAnimation("flap", [0,1], 8, true);
+			addAnimation("idle",[0]);
 			play("flap");
 			
 			height = 12;
@@ -38,12 +36,14 @@ package
 			if (_lane == 0)
 			{
 				_lane = 1;
-				velocity.y = -200;
+				layer = 2;
+				velocity.y = 200;
 			}
 			else
 			{
 				_lane = 0;
-				velocity.y = 200;
+				layer = 0;
+				velocity.y = -200;
 			}
 		}
 		
@@ -60,9 +60,29 @@ package
 			return _bob;
 		}
 		
+		override public function kill():void
+		{
+			alive = false;
+			dying = true;
+			angularVelocity = 400;
+			angularDrag = 100;
+			velocity.x = 0;
+			velocity.y = -50;
+			play("idle");
+		}
+		
 		override public function update():void
 		{	
 			super.update();
+			
+			if (dying)
+			{
+				velocityZ = BIRD_JUMP_SPEED;
+				dying = false;
+			}
+			
+			if (!alive)
+				return;
 			
 			if (y > BOTTOM_LANE.y)
 			{

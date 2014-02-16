@@ -37,6 +37,8 @@ package
 			addAnimation("short_top", [3]);
 			addAnimation("tall_bottom", [4]);
 			addAnimation("tall_top", [5]);
+			
+			layer = 1;
 		}
 		
 		public function get type():int
@@ -94,15 +96,12 @@ package
 				type = 4;
 			else
 				type = 6;
-			
-			velocity.x = -PIPE_MOVE_SPEED;
-			FlxG.log(type);
 		}
 		
 		override public function update():void
 		{	
 			super.update();
-			
+			x -= GROUND_SPEED;
 			if (x + width < 0)
 				kill();
 		}

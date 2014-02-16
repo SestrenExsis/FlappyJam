@@ -8,14 +8,20 @@ package
 	public class Entity extends FlxSprite
 	{
 		public static const BIRD_JUMP_SPEED:Number = 300;
-		public static const PIPE_MOVE_SPEED:Number = 360;
+		public static const SKY_SPEED:Number = 1;
+		public static const GROUND_SPEED:Number = 3;
+		public static const FOREGROUND_SPEED:Number = 9;
+		public static const PIPE_SPAWN_COOLDOWN:Number = 1;
 		
 		public var z:Number = 0;
 		public var velocityZ:Number = 0;
 		public var accelerationZ:Number = 0;
 		public var gravity:Number = 1000;
 		
+		protected var _lane:Number = 0;
 		protected var _position:FlxPoint;
+		
+		public var layer:int = 0;
 		
 		public function Entity(X:Number, Y:Number)
 		{
