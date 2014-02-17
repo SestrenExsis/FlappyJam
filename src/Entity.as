@@ -11,9 +11,10 @@ package
 		public static const SKY_SPEED:Number = 1;
 		public static const GROUND_SPEED:Number = 3;
 		public static const FOREGROUND_SPEED:Number = 9;
-		public static const PIPE_SPAWN_COOLDOWN:Number = 1;
+		public static const PIPE_SPAWN_COOLDOWN:Number = 0.75;
 		
 		public var z:Number = 0;
+		public var lastZ:Number = 0;
 		public var velocityZ:Number = 0;
 		public var accelerationZ:Number = 0;
 		public var gravity:Number = 1000;
@@ -37,10 +38,12 @@ package
 			return _position;
 		}
 		
-		/*override public function reset(X:Number, Y:Number):void
+		override public function preUpdate():void
 		{
-			super.reset(X - width / 2, Y - height / 2);
-		}*/
+			super.preUpdate();
+			
+			lastZ = z;
+		}
 		
 		override public function update():void
 		{	

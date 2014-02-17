@@ -1,14 +1,25 @@
 package
 {
-	import org.flixel.*;
 	import flash.geom.Rectangle;
+	
+	import org.flixel.*;
 	
 	public class GameScreen extends FlxState
 	{
-		public var bird:Bird;
-		public var entities:FlxGroup;
+		[Embed(source="../assets/images/interface.png")] protected var imgInterface:Class;
+
+		public static const GET_READY:int = 0;
+		public static const PLAYING:int = 1;
+		public static const GAME_OVER:int = 2;
 		
-		public var spawnTimer:FlxTimer;
+		public static var scrollSpeed:Number = 1;
+		
+		protected var _gameState:int = GET_READY;
+		
+		private var bird:Bird;
+		private var entities:FlxGroup;
+		private var spawnTimer:FlxTimer;
+		private var menuOverlay:FlxSprite;
 		private var hitboxRect:FlxRect;
 		
 		public function GameScreen()
@@ -44,15 +55,60 @@ package
 			entities.add(bird);
 			add(entities);
 			
+			menuOverlay = new FlxSprite(270, 92);
+			menuOverlay.loadGraphic(imgInterface, true, false, 99, 28);
+			menuOverlay.addAnimation("Game Over", [0]);
+			menuOverlay.addAnimation("Get Ready", [1]);
+			menuOverlay.play("Get Ready");
+			add(menuOverlay);
+			
 			spawnTimer = new FlxTimer();
-			spawnTimer.start(2, 1, nextObstacle);
+		}
+		
+		public function get gameState():int
+		{
+			return _gameState;
+		}
+		
+		public function set gameState(Value:int):void
+		{
+			var _priorState:int = _gameState;	
+			_gameState = Value;
+			
+			if (_gameState == GET_READY)
+			{
+				menuOverlay.play("Get Ready");
+				menuOverlay.visible = true;
+				scrollSpeed = 1;
+				spawnTimer.stop();
+				bird.inputDisabled = true;
+			}
+			else if (_gameState == PLAYING)
+			{
+				menuOverlay.visible = false;
+				scrollSpeed = 1;
+				spawnTimer.stop();
+				spawnTimer.start(2, 1, nextObstacle);
+				bird.inputDisabled = false;
+			}
+			else if (_gameState == GAME_OVER)
+			{
+				menuOverlay.play("Game Over");
+				menuOverlay.visible = true;
+				scrollSpeed = 0;
+				spawnTimer.stop();
+				bird.inputDisabled = true;
+			}
 		}
 		
 		override public function update():void
 		{	
 			super.update();
-			FlxG.overlap(entities, bird, hitTest);
 			
+			if (gameState == GET_READY && FlxG.mouse.justPressed())
+				gameState = PLAYING;
+			
+			FlxG.overlap(entities, bird, hitTest);
 			entities.sort("layer", ASCENDING);
 		}
 		
@@ -69,19 +125,33 @@ package
 			hitboxRect.width = Object1.width;
 			hitboxRect.height = Object1.height;
 			
-			if ((Object2 as Obstacle).topType > Obstacle.NONE && hitboxRect.overlaps(Obstacle.TOP_PIPE_RECT))
+			var _topType:int = (Object2 as Obstacle).topType;
+			var _bottomType:int = (Object2 as Obstacle).bottomType;
+			
+			// Bird hit the top pipe
+			if (_topType > Obstacle.NONE && hitboxRect.overlaps(Obstacle.TOP_PIPE_RECT))
 			{
-				if ((Object2 as Obstacle).topType == Obstacle.TALL || (Object1 as Bird).z < Obstacle.SHORT_PIPE_Z)
+				if (_topType == Obstacle.TALL || (Object1 as Bird).z < Obstacle.SHORT_PIPE_Z)
 				{
-					Object1.kill();
+					if (Object1.alive)
+					{
+						gameState = GAME_OVER;
+						(Object1 as Bird).hitPipe(Object2 as Obstacle, 0);
+					}
 					return true;
 				}
 			}
-			if ((Object2 as Obstacle).bottomType > Obstacle.NONE && hitboxRect.overlaps(Obstacle.BOTTOM_PIPE_RECT))
+			
+			// Bird hit the bottom pipe
+			if (_bottomType > Obstacle.NONE && hitboxRect.overlaps(Obstacle.BOTTOM_PIPE_RECT))
 			{
-				if ((Object2 as Obstacle).bottomType == Obstacle.TALL || (Object1 as Bird).z < Obstacle.SHORT_PIPE_Z)
+				if (_bottomType == Obstacle.TALL || (Object1 as Bird).z < Obstacle.SHORT_PIPE_Z)
 				{
-					Object1.kill();
+					if (Object1.alive)
+					{
+						gameState = GAME_OVER;
+						(Object1 as Bird).hitPipe(Object2 as Obstacle, 1);
+					}
 					return true;
 				}
 			}

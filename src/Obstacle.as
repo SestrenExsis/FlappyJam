@@ -14,13 +14,19 @@ package
 		public static const SHORT:int = 1;
 		public static const TALL:int = 2;
 		
-		public static const animations:Array = ["none","short_bottom","tall_bottom","short_top","short_both","none","tall_top","none","none"];
+		public static const animations:Array = [
+				"none", "short_top", "tall_top",
+				"short_bottom", "short_both", "short_bottom_tall_top",
+				"tall_bottom", "short_top_tall_bottom", "tall_both"
+		];
 		
 		public static const SHORT_PIPE_Z:Number = 24;
 		public static const TALL_PIPE_Z:Number = 55;
 		
 		public static const TOP_PIPE_RECT:FlxRect = new FlxRect(0, 54, 32, 16);
 		public static const BOTTOM_PIPE_RECT:FlxRect = new FlxRect(10, 70, 32, 16);
+		
+		public static var lastTypeSpawned:int = -1;
 		
 		protected var _type:int = 0;
 		protected var _topType:int = 0;
@@ -32,11 +38,14 @@ package
 			
 			loadGraphic(imgObstacles, true, false, 42, 86);
 			addAnimation("none", [0]);
-			addAnimation("short_both", [1]);
-			addAnimation("short_bottom", [2]);
-			addAnimation("short_top", [3]);
-			addAnimation("tall_bottom", [4]);
-			addAnimation("tall_top", [5]);
+			addAnimation("short_top", [1]);
+			addAnimation("tall_top", [2]);
+			addAnimation("short_bottom", [3]);
+			addAnimation("short_both", [4]);
+			addAnimation("short_bottom_tall_top", [5]);
+			addAnimation("tall_bottom", [6]);
+			addAnimation("short_top_tall_bottom", [7]);
+			addAnimation("tall_both", [8]);
 			
 			layer = 1;
 		}
@@ -49,8 +58,8 @@ package
 		public function set type(Value:int):void
 		{
 			_type = Value;
-			_topType = _type / 3;
-			_bottomType = _type % 3;
+			_topType = _type % 3;
+			_bottomType = _type / 3;
 			play(animations[_type]);
 		}
 		
@@ -62,7 +71,7 @@ package
 		public function set topType(Value:int):void
 		{
 			_topType = Value;
-			_type = 3 * _topType + _bottomType;;
+			_type = 3 * _bottomType + _topType;
 			play(animations[_type]);
 		}
 		
@@ -74,7 +83,7 @@ package
 		public function set bottomType(Value:int):void
 		{
 			_bottomType = Value;
-			_type = 3 * _topType + _bottomType;;
+			_type = 3 * _bottomType + _topType;
 			play(animations[_type]);
 		}
 		
@@ -84,24 +93,30 @@ package
 			var _seed:Number = FlxG.random();
 			
 			//"none","short_bottom","tall_bottom","short_top","short_both","none","tall_top","none","none"
-			if (_seed < 0.5)
+			if (_seed < 0.09)
 				type = 0;
-			else if (_seed < 0.6)
+			else if (_seed < 0.22)
 				type = 1;
-			else if (_seed < 0.7)
+			else if (_seed < 0.35)
 				type = 2;
-			else if (_seed < 0.8)
+			else if (_seed < 0.48)
 				type = 3;
-			else if (_seed < 0.9)
+			else if (_seed < 0.61)
 				type = 4;
-			else
+			else if (_seed < 0.74)
+				type = 5;
+			else if (_seed < 0.87)
 				type = 6;
+			else
+				type = 7;
+			
+			lastTypeSpawned = type;
 		}
 		
 		override public function update():void
 		{	
 			super.update();
-			x -= GROUND_SPEED;
+			x -= GROUND_SPEED * GameScreen.scrollSpeed;
 			if (x + width < 0)
 				kill();
 		}

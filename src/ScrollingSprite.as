@@ -46,8 +46,8 @@ package
 		{
 			super.update();
 			
-			scrollPosition.x += scrollSpeed.x;
-			scrollPosition.y += scrollSpeed.y;
+			scrollPosition.x += scrollSpeed.x * GameScreen.scrollSpeed;
+			scrollPosition.y += scrollSpeed.y * GameScreen.scrollSpeed;
 			if (scrollPosition.x >= frameWidth)
 				scrollPosition.x -= frameWidth;
 			else if (scrollPosition.x < 0)
