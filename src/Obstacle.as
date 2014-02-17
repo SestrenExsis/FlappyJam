@@ -9,20 +9,18 @@ package
 	public class Obstacle extends Entity
 	{	
 		[Embed(source="../assets/images/obstacles.png")] protected var imgObstacles:Class;
+		[Embed(source="assets/sounds/Pickup01.mp3")] public static var sndScore:Class;
 		
 		public static const NONE:int = 0;
 		public static const SHORT:int = 1;
 		public static const TALL:int = 2;
-		
 		public static const animations:Array = [
 				"none", "short_top", "tall_top",
 				"short_bottom", "short_both", "short_bottom_tall_top",
 				"tall_bottom", "short_top_tall_bottom", "tall_both"
 		];
-		
 		public static const SHORT_PIPE_Z:Number = 24;
 		public static const TALL_PIPE_Z:Number = 55;
-		
 		public static const TOP_PIPE_RECT:FlxRect = new FlxRect(0, 54, 32, 16);
 		public static const BOTTOM_PIPE_RECT:FlxRect = new FlxRect(10, 70, 32, 16);
 		
@@ -31,6 +29,8 @@ package
 		protected var _type:int = 0;
 		protected var _topType:int = 0;
 		protected var _bottomType:int = 0;
+		
+		private var scored:Boolean = false;
 		
 		public function Obstacle(X:Number, Y:Number)
 		{
@@ -90,35 +90,39 @@ package
 		public function respawn():void
 		{
 			reset(FlxG.width, 80);
-			var _seed:Number = FlxG.random();
 			
-			//"none","short_bottom","tall_bottom","short_top","short_both","none","tall_top","none","none"
-			if (_seed < 0.09)
-				type = 0;
-			else if (_seed < 0.22)
-				type = 1;
-			else if (_seed < 0.35)
-				type = 2;
-			else if (_seed < 0.48)
-				type = 3;
-			else if (_seed < 0.61)
-				type = 4;
-			else if (_seed < 0.74)
-				type = 5;
-			else if (_seed < 0.87)
-				type = 6;
-			else
-				type = 7;
+			var _pipes:Array;
+			if (lastTypeSpawned == -1 || lastTypeSpawned == 0 || lastTypeSpawned == 4)
+			{
+				_pipes = [0, 1, 2, 3, 4, 5, 6, 7];
+			}
+			else if (lastTypeSpawned <= 2 || lastTypeSpawned == 5)
+			{
+				_pipes = [3, 4, 5, 6, 7];
+			}
+			else if (lastTypeSpawned == 3 || lastTypeSpawned == 6 || lastTypeSpawned == 7)
+			{
+				_pipes = [1, 2, 4, 5, 7];
+			}
 			
+			var _seed:Number = Math.floor(_pipes.length * Math.random());
+			type = _pipes[_seed];
 			lastTypeSpawned = type;
+			scored = false;
 		}
 		
 		override public function update():void
 		{	
 			super.update();
-			x -= GROUND_SPEED * GameScreen.scrollSpeed;
+			x -= GameScreen.GROUND_SPEED * GameScreen.scrollSpeed;
 			if (x + width < 0)
 				kill();
+			else if (x <= 0 && type > 0 && !scored)
+			{
+				FlxG.score += 1;
+				scored = true;
+				FlxG.play(sndScore, 0.5);
+			}
 		}
 		
 		override public function draw():void

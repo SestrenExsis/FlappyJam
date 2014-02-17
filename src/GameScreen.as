@@ -7,6 +7,12 @@ package
 	public class GameScreen extends FlxState
 	{
 		[Embed(source="../assets/images/interface.png")] protected var imgInterface:Class;
+		
+		public static const BIRD_JUMP_SPEED:Number = 250;
+		public static const SKY_SPEED:Number = 1;
+		public static const GROUND_SPEED:Number = 5;
+		public static const FOREGROUND_SPEED:Number = 10;
+		public static const PIPE_SPAWN_COOLDOWN:Number = 0.65;
 
 		public static const GET_READY:int = 0;
 		public static const PLAYING:int = 1;
@@ -37,11 +43,11 @@ package
 			FlxG.bgColor = 0xff808080;
 			
 			var _rect:Rectangle = new Rectangle(0, 0, 640, 131);
-			add(new ScrollingSprite(0, 0, _rect, Entity.SKY_SPEED, 0));
+			add(new ScrollingSprite(0, 0, _rect, SKY_SPEED, 0));
 			_rect.setTo(0, 131, 640, 38);
-			add(new ScrollingSprite(0, 131, _rect, Entity.GROUND_SPEED, 0));
+			add(new ScrollingSprite(0, 131, _rect, GROUND_SPEED, 0));
 			_rect.setTo(0, 169, 640, 71);
-			add(new ScrollingSprite(0, 169, _rect, Entity.FOREGROUND_SPEED, 0));
+			add(new ScrollingSprite(0, 169, _rect, FOREGROUND_SPEED, 0));
 			
 			var _obstacle:Obstacle;
 			entities = new FlxGroup();
@@ -88,7 +94,7 @@ package
 				menuOverlay.visible = false;
 				scrollSpeed = 1;
 				spawnTimer.stop();
-				spawnTimer.start(2, 1, nextObstacle);
+				spawnTimer.start(1, 1, nextObstacle);
 				bird.inputDisabled = false;
 			}
 			else if (_gameState == GAME_OVER)
@@ -166,7 +172,7 @@ package
 				_obstacle.respawn();
 			}
 			
-			Timer.start(Entity.PIPE_SPAWN_COOLDOWN, 1, nextObstacle);
+			Timer.start(PIPE_SPAWN_COOLDOWN, 1, nextObstacle);
 		}
 		
 		public static function playRandomSound(Sounds:Array, VolumeMultiplier:Number = 1.0):void

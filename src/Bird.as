@@ -88,7 +88,7 @@ package
 			
 			if (z < _pipeHeight && lastZ > _pipeHeight)
 			{ // Bird hit the top of the pipe
-				velocityZ = 0.5 * BIRD_JUMP_SPEED;
+				velocityZ = 0.5 * GameScreen.BIRD_JUMP_SPEED;
 			}
 			
 			kill();
@@ -111,7 +111,7 @@ package
 			
 			if (dying)
 			{
-				velocityZ = BIRD_JUMP_SPEED;
+				velocityZ = GameScreen.BIRD_JUMP_SPEED;
 				dying = false;
 			}
 			
@@ -142,7 +142,7 @@ package
 				return;
 			
 			if (z <= 0 && (FlxG.mouse.justPressed() || FlxG.keys.justPressed("UP")))
-				velocityZ += BIRD_JUMP_SPEED;
+				velocityZ += GameScreen.BIRD_JUMP_SPEED;
 			
 			if (FlxG.keys.justPressed("DOWN"))
 				switchLane();
@@ -169,6 +169,10 @@ package
 			_flashPoint.y = _yy;
 			
 			super.draw();
+			
+			// Draw point of contact with surface
+			//
+			//
 		}
 	}
 }

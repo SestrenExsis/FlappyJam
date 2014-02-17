@@ -7,11 +7,6 @@ package
 	
 	public class Entity extends FlxSprite
 	{
-		public static const BIRD_JUMP_SPEED:Number = 300;
-		public static const SKY_SPEED:Number = 1;
-		public static const GROUND_SPEED:Number = 3;
-		public static const FOREGROUND_SPEED:Number = 9;
-		public static const PIPE_SPAWN_COOLDOWN:Number = 0.75;
 		
 		public var z:Number = 0;
 		public var lastZ:Number = 0;
