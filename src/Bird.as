@@ -10,7 +10,6 @@ package
 	{	
 		[Embed(source="../assets/images/bird.png")] protected var imgBird:Class;
 		
-		
 		public static const TOP_LANE:FlxPoint = new FlxPoint(76, 134 + 2);
 		public static const BOTTOM_LANE:FlxPoint = new FlxPoint(86, 150 + 2);
 		
@@ -19,10 +18,12 @@ package
 		protected var _bobAmount:Number = 6;
 		
 		public var inputDisabled:Boolean = true;
+		public var explosion:FlxSprite;
+		public var hitTimer:FlxTimer;
 		
 		private var dying:Boolean = false;
 		
-		public function Bird(X:Number, Y:Number)
+		public function Bird(X:Number, Y:Number, Explosion:FlxSprite = null)
 		{
 			super(X, Y);
 			
@@ -31,6 +32,12 @@ package
 			addAnimation("idle",[0]);
 			play("flap");
 			height = 12;
+			
+			hitTimer = new FlxTimer();
+			hitTimer.start(0.01, 1);
+			
+			if (Explosion)
+				explosion = Explosion;
 		}
 		
 		public function switchLane():void
@@ -86,9 +93,22 @@ package
 			_pipeRect.x += Pipe.x;
 			_pipeRect.y += Pipe.y;
 			
-			if (z < _pipeHeight && lastZ > _pipeHeight)
+			/*if (z < _pipeHeight && lastZ > _pipeHeight)
 			{ // Bird hit the top of the pipe
 				velocityZ = 0.5 * GameScreen.BIRD_JUMP_SPEED;
+				//hitLocation.make(
+			}*/
+			
+			if (explosion)
+			{
+				var _hitRect:FlxRect = new FlxRect();
+				_hitRect.x = Math.max(x, _pipeRect.x);
+				_hitRect.width = Math.min(x + width, _pipeRect.x + _pipeRect.width) - _hitRect.x;
+				_hitRect.y = Math.max(y, _pipeRect.y);
+				_hitRect.height = Math.min(y + height, _pipeRect.y + _pipeRect.height) - _hitRect.y;
+				explosion.x = _hitRect.x + 0.5 * _hitRect.width - 0.5 * explosion.width;
+				explosion.y = _hitRect.y + 0.5 * _hitRect.height - z - 0.5 * explosion.height;
+				explosion.play("explode", true);
 			}
 			
 			kill();
@@ -169,10 +189,6 @@ package
 			_flashPoint.y = _yy;
 			
 			super.draw();
-			
-			// Draw point of contact with surface
-			//
-			//
 		}
 	}
 }

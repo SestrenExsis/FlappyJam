@@ -7,6 +7,7 @@ package
 	public class GameScreen extends FlxState
 	{
 		[Embed(source="../assets/images/interface.png")] protected var imgInterface:Class;
+		[Embed(source="../assets/images/bird.png")] protected var imgExplosion:Class;
 		
 		public static const BIRD_JUMP_SPEED:Number = 250;
 		public static const SKY_SPEED:Number = 1;
@@ -24,6 +25,7 @@ package
 		
 		private var bird:Bird;
 		private var entities:FlxGroup;
+		private var explosion:FlxSprite;
 		private var spawnTimer:FlxTimer;
 		private var menuOverlay:FlxSprite;
 		private var hitboxRect:FlxRect;
@@ -57,9 +59,15 @@ package
 				_obstacle.kill();
 				entities.add(_obstacle);
 			}
-			bird = new Bird(Bird.TOP_LANE.x, Bird.TOP_LANE.y);
+			explosion = new FlxSprite();
+			explosion.loadGraphic(imgExplosion, true, false, 32, 24);
+			explosion.addAnimation("none", [6]);
+			explosion.addAnimation("explode", [4, 5, 6], 6, false);
+			explosion.play("none");
+			bird = new Bird(Bird.TOP_LANE.x, Bird.TOP_LANE.y, explosion);
 			entities.add(bird);
 			add(entities);
+			add(explosion);
 			
 			menuOverlay = new FlxSprite(270, 92);
 			menuOverlay.loadGraphic(imgInterface, true, false, 99, 28);
@@ -105,17 +113,6 @@ package
 				spawnTimer.stop();
 				bird.inputDisabled = true;
 			}
-		}
-		
-		override public function update():void
-		{	
-			super.update();
-			
-			if (gameState == GET_READY && FlxG.mouse.justPressed())
-				gameState = PLAYING;
-			
-			FlxG.overlap(entities, bird, hitTest);
-			entities.sort("layer", ASCENDING);
 		}
 		
 		public function hitTest(Object1:FlxObject, Object2:FlxObject):Boolean
@@ -179,6 +176,22 @@ package
 		{
 			var _seed:Number = Math.floor(Sounds.length * Math.random());
 			FlxG.play(Sounds[_seed], VolumeMultiplier, false, false);
+		}
+		
+		override public function update():void
+		{	
+			super.update();
+			
+			if (gameState == GET_READY && FlxG.mouse.justPressed())
+				gameState = PLAYING;
+			
+			FlxG.overlap(entities, bird, hitTest);
+			entities.sort("layer", ASCENDING);
+		}
+		
+		override public function draw():void
+		{
+			super.draw();
 		}
 	}
 }
