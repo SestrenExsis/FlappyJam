@@ -17,7 +17,6 @@ package
 		protected var _bobSpeed:Number = 6;
 		protected var _bobAmount:Number = 6;
 		
-		public var inputDisabled:Boolean = true;
 		public var explosion:FlxSprite;
 		public var hitTimer:FlxTimer;
 		
@@ -131,6 +130,7 @@ package
 			hitTimer.stop();
 			hitTimer.start(0.01, 1);
 			_lane = 0;
+			layer = 0;
 			_bob = 0;
 			play("flap");
 		}
@@ -168,13 +168,10 @@ package
 			x = TOP_LANE.x + _laneProgress * (BOTTOM_LANE.x - TOP_LANE.x)
 			offset.y += 24 + 0.5 * _bobAmount + _bobAmount * Math.cos(bob);
 			
-			if (inputDisabled)
-				return;
-			
-			if (z <= 0 && (FlxG.mouse.justPressed() || FlxG.keys.justPressed("UP")))
+			if (z <= 0 && GameInput.bufferedJump())
 				velocityZ += GameScreen.BIRD_JUMP_SPEED;
 			
-			if (FlxG.keys.justPressed("DOWN"))
+			if (GameInput.action == GameInput.SWITCH_LANE)
 				switchLane();
 		}
 		
