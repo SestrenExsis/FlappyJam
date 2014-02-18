@@ -71,17 +71,17 @@ package
 		
 		public function hitPipe(Pipe:Obstacle, Lane:int):void
 		{
-			var _pipeRect:FlxRect;
+			var _pipeRect:FlxRect = new FlxRect();
 			var _pipeType:Number = 0;
 			var _pipeHeight:Number = 0;
 			if (Lane == 0)
 			{
-				_pipeRect = Obstacle.TOP_PIPE_RECT;
+				_pipeRect.copyFrom(Obstacle.TOP_PIPE_RECT);
 				_pipeType = Pipe.topType;
 			}
 			else if (Lane == 1)
 			{
-				_pipeRect = Obstacle.BOTTOM_PIPE_RECT;
+				_pipeRect.copyFrom(Obstacle.BOTTOM_PIPE_RECT);
 				_pipeType = Pipe.bottomType;
 			}
 			
@@ -92,12 +92,6 @@ package
 			
 			_pipeRect.x += Pipe.x;
 			_pipeRect.y += Pipe.y;
-			
-			/*if (z < _pipeHeight && lastZ > _pipeHeight)
-			{ // Bird hit the top of the pipe
-				velocityZ = 0.5 * GameScreen.BIRD_JUMP_SPEED;
-				//hitLocation.make(
-			}*/
 			
 			if (explosion)
 			{
@@ -123,6 +117,22 @@ package
 			velocity.x = 0;
 			velocity.y = -50;
 			play("idle");
+		}
+		
+		public function respawn():void
+		{
+			reset(TOP_LANE.x, TOP_LANE.y);
+			z = 0;
+			lastZ = z;
+			velocityZ = 0;
+			accelerationZ = 0;
+			angularVelocity = angularDrag = 0;
+			angle = 0;
+			hitTimer.stop();
+			hitTimer.start(0.01, 1);
+			_lane = 0;
+			_bob = 0;
+			play("flap");
 		}
 		
 		override public function update():void

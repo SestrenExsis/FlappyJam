@@ -95,7 +95,15 @@ package
 				menuOverlay.visible = true;
 				scrollSpeed = 1;
 				spawnTimer.stop();
+				bird.respawn();
 				bird.inputDisabled = true;
+				var _entity:Entity;
+				for (var i:int = 0; i < entities.members.length; i++)
+				{
+					_entity = entities.members[i];
+					if (_entity && (_entity is Obstacle))
+						_entity.kill();
+				}
 			}
 			else if (_gameState == PLAYING)
 			{
@@ -168,7 +176,7 @@ package
 			{
 				_obstacle.respawn();
 			}
-			
+			Timer.stop();
 			Timer.start(PIPE_SPAWN_COOLDOWN, 1, nextObstacle);
 		}
 		
@@ -182,8 +190,13 @@ package
 		{	
 			super.update();
 			
-			if (gameState == GET_READY && FlxG.mouse.justPressed())
-				gameState = PLAYING;
+			if (FlxG.mouse.justPressed())
+			{
+				if (gameState == GET_READY) 
+					gameState = PLAYING;
+				else if (gameState == GAME_OVER)
+					gameState = GET_READY;
+			}
 			
 			FlxG.overlap(entities, bird, hitTest);
 			entities.sort("layer", ASCENDING);
