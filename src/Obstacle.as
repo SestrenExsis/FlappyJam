@@ -24,7 +24,8 @@ package
 		public static const TOP_PIPE_RECT:FlxRect = new FlxRect(0, 54, 32, 16);
 		public static const BOTTOM_PIPE_RECT:FlxRect = new FlxRect(10, 70, 32, 16);
 		
-		public static var lastTypeSpawned:int = -1;
+		public static var previousSpawns:Array = [-1, -1, -1, -1, -1, -1];
+		public static var spawnPos:int = 0;
 		
 		protected var _type:int = 0;
 		protected var _topType:int = 0;
@@ -92,22 +93,25 @@ package
 			reset(FlxG.width, 80);
 			
 			var _pipes:Array;
-			if (lastTypeSpawned == -1 || lastTypeSpawned == 0 || lastTypeSpawned == 4)
+			var _lastTypeSpawned:int = previousSpawns[spawnPos];
+			if (_lastTypeSpawned == -1 || _lastTypeSpawned == 0 || _lastTypeSpawned == 4)
 			{
 				_pipes = [0, 1, 2, 3, 4, 5, 6, 7];
 			}
-			else if (lastTypeSpawned <= 2 || lastTypeSpawned == 5)
+			else if (_lastTypeSpawned <= 2 || _lastTypeSpawned == 5)
 			{
 				_pipes = [3, 4, 5, 6, 7];
 			}
-			else if (lastTypeSpawned == 3 || lastTypeSpawned == 6 || lastTypeSpawned == 7)
+			else if (_lastTypeSpawned == 3 || _lastTypeSpawned == 6 || _lastTypeSpawned == 7)
 			{
 				_pipes = [1, 2, 4, 5, 7];
 			}
 			
 			var _seed:Number = Math.floor(_pipes.length * Math.random());
 			type = _pipes[_seed];
-			lastTypeSpawned = type;
+			
+			spawnPos = (spawnPos >= previousSpawns.length) ? 0 : spawnPos++;
+			previousSpawns[spawnPos] = type;
 			scored = false;
 		}
 		

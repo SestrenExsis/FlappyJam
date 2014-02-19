@@ -34,13 +34,15 @@ package
 			
 			if (enabled)
 			{
+				var _desiredLane:int;
+				if (FlxG.mouse.screenY <= 0.5 * FlxG.height)
+					_desiredLane = 0;
+				else _desiredLane = 1;
+				
 				if (_click)
-				{
-					if (FlxG.mouse.screenY <= 0.5 * FlxG.height)
-						mouseClicked = JUMP;
-					else
-						mouseClicked = SWITCH_LANE;
-				}
+					mouseClicked = JUMP;
+				else if (_desiredLane != Bird.currentLane)
+					mouseClicked = SWITCH_LANE;
 				
 				if (_jump) keyPressed = JUMP;
 				else if (_switch) keyPressed = SWITCH_LANE;

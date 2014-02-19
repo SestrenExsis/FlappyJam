@@ -13,6 +13,8 @@ package
 		public static const TOP_LANE:FlxPoint = new FlxPoint(76, 134 + 2);
 		public static const BOTTOM_LANE:FlxPoint = new FlxPoint(86, 150 + 2);
 		
+		public static var currentLane:int = 0;
+		
 		protected var _bob:Number = 0;
 		protected var _bobSpeed:Number = 6;
 		protected var _bobAmount:Number = 6;
@@ -43,12 +45,14 @@ package
 		{
 			if (_lane == 0)
 			{
+				currentLane = 1;
 				_lane = 1;
 				layer = 2;
 				velocity.y = 200;
 			}
 			else
 			{
+				currentLane = 0;
 				_lane = 0;
 				layer = 0;
 				velocity.y = -200;

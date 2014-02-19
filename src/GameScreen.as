@@ -55,7 +55,7 @@ package
 			
 			var _obstacle:Obstacle;
 			entities = new FlxGroup();
-			for (var i:int = 0; i < 30; i++)
+			for (var i:int = 0; i < 6; i++)
 			{
 				_obstacle = new Obstacle(-1000, -1000);
 				_obstacle.kill();
