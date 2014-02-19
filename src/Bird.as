@@ -115,10 +115,12 @@ package
 		{
 			alive = false;
 			dying = true;
-			angularVelocity = 400;
-			angularDrag = 100;
-			velocity.x = 0;
-			velocity.y = -50;
+			velocity.x = position.x - explosion.x - 0.5 * explosion.width;
+			velocity.y = position.y - explosion.y - 0.5 * explosion.height;
+			angularVelocity = (velocity.x > 0) ? 800 : -800;
+			angularDrag = 800;
+			drag.x = 25;
+			drag.y = 100;
 			play("idle");
 		}
 		
@@ -129,10 +131,11 @@ package
 			lastZ = z;
 			velocityZ = 0;
 			accelerationZ = 0;
-			angularVelocity = angularDrag = 0;
+			angularVelocity = angularDrag = drag.x = drag.y = 0;
 			angle = 0;
 			hitTimer.stop();
 			hitTimer.start(0.01, 1);
+			currentLane = 0;
 			_lane = 0;
 			layer = 0;
 			_bob = 0;

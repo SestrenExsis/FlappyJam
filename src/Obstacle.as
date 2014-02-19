@@ -132,20 +132,6 @@ package
 		override public function draw():void
 		{
 			super.draw();
-			
-			// Draw hitboxes
-			/*_flashRect.x = TOP_PIPE_RECT.x + x;
-			_flashRect.y = TOP_PIPE_RECT.y + y;
-			_flashRect.width = TOP_PIPE_RECT.width;
-			_flashRect.height = TOP_PIPE_RECT.height;
-			FlxG.camera.buffer.fillRect(_flashRect, 0xffffffff);
-			
-			_flashRect.x = BOTTOM_PIPE_RECT.x + x;
-			_flashRect.y = BOTTOM_PIPE_RECT.y + y;
-			_flashRect.width = BOTTOM_PIPE_RECT.width;
-			_flashRect.height = BOTTOM_PIPE_RECT.height;
-			
-			FlxG.camera.buffer.fillRect(_flashRect, 0xffffffff);*/
 		}
 	}
 }

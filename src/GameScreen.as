@@ -20,14 +20,13 @@ package
 		public static const GAME_OVER:int = 2;
 		
 		public static var scrollSpeed:Number = 1;
-		public static var highScore:Number = 0;
 		
 		protected var _gameState:int = GET_READY;
 		
 		private var bird:Bird;
 		private var entities:FlxGroup;
 		private var explosion:FlxSprite;
-		private var scoreboard:FlxText;
+		private var scoreboard:FlxSprite;
 		private var spawnTimer:FlxTimer;
 		private var menuOverlay:FlxSprite;
 		private var hitboxRect:FlxRect;
@@ -40,6 +39,7 @@ package
 		override public function create():void
 		{
 			super.create();
+			UserSettings.load();
 			FlxG.flash(0xff000000, 0.5);
 			
 			hitboxRect = new FlxRect();
@@ -78,8 +78,7 @@ package
 			menuOverlay.play("Get Ready");
 			add(menuOverlay);
 			
-			scoreboard = new FlxText(8, 8, 72, "");
-			scoreboard.setFormat(null, 24, 0xffffff, "right", 0x000001);
+			scoreboard = new Scoreboard();
 			add(scoreboard);
 			
 			spawnTimer = new FlxTimer();
@@ -114,10 +113,7 @@ package
 			else if (_gameState == PLAYING)
 			{
 				if (_priorState != PLAYING)
-				{
-					highScore = FlxG.score;
 					FlxG.score = 0;
-				}
 				menuOverlay.visible = false;
 				scrollSpeed = 1;
 				spawnTimer.stop();
@@ -126,6 +122,9 @@ package
 			}
 			else if (_gameState == GAME_OVER)
 			{
+				if (FlxG.score > UserSettings.bestScore)
+					UserSettings.bestScore = FlxG.score;
+				menuOverlay.x = FlxG.width;
 				menuOverlay.play("Game Over");
 				menuOverlay.visible = true;
 				scrollSpeed = 0;
@@ -213,7 +212,10 @@ package
 			FlxG.overlap(entities, bird, hitTest);
 			entities.sort("layer", ASCENDING);
 			
-			scoreboard.text = FlxG.score.toString();
+			if (menuOverlay.x < 271)
+				menuOverlay.x = 270;
+			else if (menuOverlay.x > 270)
+				menuOverlay.x = FlxTween.linear(0.9, 270, menuOverlay.x - 270, 1);
 		}
 		
 		override public function draw():void
