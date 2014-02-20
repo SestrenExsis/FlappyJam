@@ -11,9 +11,10 @@ package
 		
 		public function Scoreboard()
 		{
-			super(0.5 * FlxG.width - 20, 8);
+			super(0, 8);
 			
-			loadGraphic(imgNumbers, true, false, 10, 17);
+			loadGraphic(imgNumbers, true, false, 20, 34);
+			x = 0.5 * FlxG.width - 2 * frameWidth;
 		}
 		
 		override public function update():void
@@ -31,19 +32,23 @@ package
 			//super.draw();
 			
 			// Draw the score to the screen
-			var _drawZero:Boolean = false;
+			var _numDigits:int = 1;
+			for (var i:int = 1; i < 4; i++)
+			{
+				if (FlxG.score >= Math.pow(10, i))
+					_numDigits++;
+			}
+			//var _drawZero:Boolean = false;
 			var _digit:int;
-			for (var i:int = 0; i < 4; i++)
+			for (i = 0; i < 4; i++)
 			{
 				//_digit = FlxG.score / Math.pow(10, i) - (FlxG.score / (Math.pow(10, i + 1) * Math.pow(10, i + 1)));
 				_digit = (FlxG.score / (int)(Math.pow(10, 3 - i))) % 10;
-				if (_digit > 0 || i == 3)
-					_drawZero = true;
-				if (_drawZero)
+				if (4 - i <= _numDigits)
 				{
-					_flashRect.x = 10 * _digit;
+					_flashRect.x = frameWidth * _digit;
 					_flashRect.y = 0;
-					_flashPoint.x = x + 10 * i;
+					_flashPoint.x = x + frameWidth * (i - 0.5 * (4 - _numDigits));
 					_flashPoint.y = y;
 					
 					FlxG.camera.buffer.copyPixels(_pixels, _flashRect, _flashPoint, null, null, true);
