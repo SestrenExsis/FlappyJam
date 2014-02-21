@@ -6,6 +6,7 @@ package
 	
 	public class GameScreen extends FlxState
 	{
+		[Embed(source="../assets/images/instructions.png")] protected var imgInstructions:Class;
 		[Embed(source="../assets/images/interface.png")] protected var imgInterface:Class;
 		[Embed(source="../assets/images/bird.png")] protected var imgExplosion:Class;
 		
@@ -15,19 +16,22 @@ package
 		public static const FOREGROUND_SPEED:Number = 10;
 		public static const PIPE_SPAWN_COOLDOWN:Number = 0.65;
 
-		public static const GET_READY:int = 0;
-		public static const PLAYING:int = 1;
-		public static const GAME_OVER:int = 2;
+		public static const INSTRUCTIONS:int = 0;
+		public static const GET_READY:int = 1;
+		public static const PLAYING:int = 2;
+		public static const GAME_OVER:int = 3;
+		public static const SHOW_SCORES:int = 3;
 		
 		public static var scrollSpeed:Number = 1;
 		
-		protected var _gameState:int = GET_READY;
+		protected var _gameState:int;
 		
 		private var bird:Bird;
 		private var entities:FlxGroup;
 		private var explosion:FlxSprite;
 		private var scoreboard:FlxSprite;
 		private var spawnTimer:FlxTimer;
+		private var instructionsOverlay:FlxSprite;
 		private var menuOverlay:FlxSprite;
 		private var hitboxRect:FlxRect;
 		
@@ -71,6 +75,12 @@ package
 			add(entities);
 			add(explosion);
 			
+			instructionsOverlay = new FlxSprite(192, 56);
+			instructionsOverlay.loadGraphic(imgInstructions, true, false, 256, 128);
+			instructionsOverlay.addAnimation("rules", [0, 1], 8, true);
+			instructionsOverlay.play("rules");
+			add(instructionsOverlay);
+			
 			menuOverlay = new FlxSprite(270, 92);
 			menuOverlay.loadGraphic(imgInterface, true, false, 99, 28);
 			menuOverlay.addAnimation("Game Over", [0]);
@@ -82,6 +92,7 @@ package
 			add(scoreboard);
 			
 			spawnTimer = new FlxTimer();
+			gameState = INSTRUCTIONS;
 		}
 		
 		public function get gameState():int
@@ -94,12 +105,25 @@ package
 			var _priorState:int = _gameState;	
 			_gameState = Value;
 			
-			if (_gameState == GET_READY)
+			if (_gameState == INSTRUCTIONS)
 			{
+				instructionsOverlay.x = FlxG.width;
+				instructionsOverlay.visible = true;
+				menuOverlay.visible = false;
+				scrollSpeed = 1;
+				spawnTimer.stop();
+				bird.respawn();
+				GameInput.enabled = false;
+			}
+			else if (_gameState == GET_READY)
+			{
+				instructionsOverlay.x = 191;
+				menuOverlay.x = FlxG.width;
 				menuOverlay.play("Get Ready");
 				menuOverlay.visible = true;
 				scrollSpeed = 1;
 				spawnTimer.stop();
+				spawnTimer.start(2, 1, beginPlaying);
 				bird.respawn();
 				GameInput.enabled = false;
 				var _entity:Entity;
@@ -114,7 +138,8 @@ package
 			{
 				if (_priorState != PLAYING)
 					FlxG.score = 0;
-				menuOverlay.visible = false;
+				instructionsOverlay.visible = false;
+				menuOverlay.x = 269;
 				scrollSpeed = 1;
 				spawnTimer.stop();
 				spawnTimer.start(1, 1, nextObstacle);
@@ -124,12 +149,24 @@ package
 			{
 				if (FlxG.score > UserSettings.bestScore)
 					UserSettings.bestScore = FlxG.score;
+				instructionsOverlay.visible = false;
 				menuOverlay.x = FlxG.width;
 				menuOverlay.play("Game Over");
 				menuOverlay.visible = true;
 				scrollSpeed = 0;
 				spawnTimer.stop();
 				GameInput.enabled = false;
+			}
+			else if (_gameState == SHOW_SCORES)
+			{
+				if (FlxG.score > UserSettings.bestScore)
+					UserSettings.bestScore = FlxG.score;
+				instructionsOverlay.visible = false;
+				menuOverlay.visible = false;
+				scrollSpeed = 0;
+				spawnTimer.stop();
+				GameInput.enabled = false;
+				// show the current and high scores
 			}
 		}
 		
@@ -179,8 +216,15 @@ package
 			return false;
 		}
 		
+		public function beginPlaying(Timer:FlxTimer):void
+		{
+			menuOverlay.x = 269;
+			gameState = PLAYING;
+		}
+		
 		public function nextObstacle(Timer:FlxTimer):void
 		{
+			menuOverlay.visible = false;
 			var _obstacle:Obstacle = Obstacle(entities.getFirstAvailable(Obstacle));
 			if (_obstacle)
 			{
@@ -203,7 +247,9 @@ package
 			
 			if (GameInput.action == GameInput.START)
 			{
-				if (gameState == GET_READY) 
+				if (gameState == INSTRUCTIONS)
+					gameState = GET_READY;
+				else if (gameState == GET_READY) 
 					gameState = PLAYING;
 				else if (gameState == GAME_OVER)
 					gameState = GET_READY;
@@ -212,10 +258,25 @@ package
 			FlxG.overlap(entities, bird, hitTest);
 			entities.sort("layer", ASCENDING);
 			
-			if (menuOverlay.x < 271)
-				menuOverlay.x = 270;
-			else if (menuOverlay.x > 270)
-				menuOverlay.x = FlxTween.linear(0.9, 270, menuOverlay.x - 270, 1);
+			if (instructionsOverlay.visible)
+			{
+				if (instructionsOverlay.x < 192)
+					instructionsOverlay.x = FlxTween.linear(0.9, -30, instructionsOverlay.x, 1);
+				else if (instructionsOverlay.x < 193)
+					instructionsOverlay.x = 192;
+				else if (instructionsOverlay.x > 192)
+					instructionsOverlay.x = FlxTween.linear(0.9, 192, instructionsOverlay.x - 192, 1);
+			}
+			
+			if (menuOverlay.visible)
+			{
+				if (menuOverlay.x < 270)
+					menuOverlay.x = FlxTween.linear(0.9, -30, menuOverlay.x, 1);
+				else if (menuOverlay.x < 271)
+					menuOverlay.x = 270;
+				else if (menuOverlay.x > 270)
+					menuOverlay.x = FlxTween.linear(0.9, 270, menuOverlay.x - 270, 1);
+			}
 		}
 		
 		override public function draw():void
