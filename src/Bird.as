@@ -9,9 +9,10 @@ package
 	public class Bird extends Entity
 	{	
 		[Embed(source="../assets/images/bird.png")] protected var imgBird:Class;
+		[Embed(source="assets/sounds/Hit01.mp3")] public static var sndHit:Class;
 		
-		public static const TOP_LANE:FlxPoint = new FlxPoint(76, 134 + 2);
-		public static const BOTTOM_LANE:FlxPoint = new FlxPoint(86, 150 + 2);
+		public static const TOP_LANE:FlxPoint = new FlxPoint(76, 134 + 2 + GameScreen.SCREEN_OFFSET_Y);
+		public static const BOTTOM_LANE:FlxPoint = new FlxPoint(86, 150 + 2 + GameScreen.SCREEN_OFFSET_Y);
 		
 		public static var currentLane:int = 0;
 		
@@ -127,6 +128,7 @@ package
 			drag.y = 100;
 			play("idle");
 			FlxG.shake(0.01, 0.15);
+			FlxG.play(sndHit, 0.5);
 		}
 		
 		public function respawn():void

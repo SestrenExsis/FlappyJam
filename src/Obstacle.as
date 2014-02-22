@@ -90,7 +90,7 @@ package
 		
 		public function respawn():void
 		{
-			reset(FlxG.width, 80);
+			reset(FlxG.width, 80 + GameScreen.SCREEN_OFFSET_Y);
 			
 			var _pipes:Array;
 			var _lastTypeSpawned:int = previousSpawns[spawnPos];

@@ -10,6 +10,8 @@ package
 		[Embed(source="../assets/images/interface.png")] protected var imgInterface:Class;
 		[Embed(source="../assets/images/bird.png")] protected var imgExplosion:Class;
 		
+		public static const SCREEN_OFFSET_Y:Number = 120;
+		
 		public static const BIRD_JUMP_SPEED:Number = 250;
 		public static const SKY_SPEED:Number = 1;
 		public static const GROUND_SPEED:Number = 5;
@@ -49,14 +51,14 @@ package
 			
 			hitboxRect = new FlxRect();
 			
-			FlxG.bgColor = 0xff808080;
+			FlxG.bgColor = 0xff70c5ce;
 			
 			var _rect:Rectangle = new Rectangle(0, 0, 640, 131);
-			add(new ScrollingSprite(0, 0, _rect, SKY_SPEED, 0));
+			add(new ScrollingSprite(0, 0 + SCREEN_OFFSET_Y, _rect, SKY_SPEED, 0));
 			_rect.setTo(0, 131, 640, 38);
-			add(new ScrollingSprite(0, 131, _rect, GROUND_SPEED, 0));
+			add(new ScrollingSprite(0, 131 + SCREEN_OFFSET_Y, _rect, GROUND_SPEED, 0));
 			_rect.setTo(0, 169, 640, 71);
-			add(new ScrollingSprite(0, 169, _rect, FOREGROUND_SPEED, 0));
+			add(new ScrollingSprite(0, 169 + SCREEN_OFFSET_Y, _rect, FOREGROUND_SPEED, 0));
 			
 			var _obstacle:Obstacle;
 			entities = new FlxGroup();
@@ -76,24 +78,24 @@ package
 			add(entities);
 			add(explosion);
 			
-			instructionsOverlay = new FlxSprite(192, 56);
+			instructionsOverlay = new FlxSprite(192, 56 + SCREEN_OFFSET_Y);
 			instructionsOverlay.loadGraphic(imgInstructions, true, false, 256, 128);
 			instructionsOverlay.addAnimation("rules", [0, 1], 8, true);
 			instructionsOverlay.addAnimation("score", [2, 3], 1, true);
 			instructionsOverlay.play("rules");
 			add(instructionsOverlay);
 			
-			menuOverlay = new FlxSprite(270, 92);
+			menuOverlay = new FlxSprite(270, 92 + SCREEN_OFFSET_Y);
 			menuOverlay.loadGraphic(imgInterface, true, false, 99, 28);
 			menuOverlay.addAnimation("Game Over", [0]);
 			menuOverlay.addAnimation("Get Ready", [1]);
 			menuOverlay.play("Get Ready");
 			add(menuOverlay);
 			
-			currentScore = new Scoreboard(0.5 * FlxG.width - 20, 8);
+			currentScore = new Scoreboard(0.5 * FlxG.width - 20, 8 + SCREEN_OFFSET_Y);
 			add(currentScore);
 			
-			highScore = new Scoreboard(192 + 10, 56 + 65);
+			highScore = new Scoreboard(192 + 10, 56 + 65 + SCREEN_OFFSET_Y);
 			add(highScore);
 			
 			spawnTimer = new FlxTimer();
@@ -129,7 +131,7 @@ package
 				currentScore.score = 0;
 				currentScore.targetScore = 0;
 				currentScore.x = 0.5 * FlxG.width - 20;
-				currentScore.y = 8;
+				currentScore.y = 8 + SCREEN_OFFSET_Y;
 				currentScore.visible = true;
 				FlxG.score = 0;
 				instructionsOverlay.x = 191;
@@ -242,7 +244,7 @@ package
 			currentScore.targetScore = FlxG.score;
 			currentScore.visible = true;
 			currentScore.x = 192 + 10;
-			currentScore.y = 56 + 7;
+			currentScore.y = 56 + 7 + SCREEN_OFFSET_Y;
 			highScore.visible = true;
 		}
 		

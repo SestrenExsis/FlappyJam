@@ -38,7 +38,7 @@ package
 			if (enabled)
 			{
 				var _desiredLane:int;
-				if (FlxG.mouse.screenY <= 0.5 * FlxG.height)
+				if (FlxG.mouse.screenY <= 0.5 * (FlxG.height + GameScreen.SCREEN_OFFSET_Y))
 					_desiredLane = 0;
 				else _desiredLane = 1;
 				
