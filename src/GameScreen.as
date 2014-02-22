@@ -20,7 +20,7 @@ package
 		public static const GET_READY:int = 1;
 		public static const PLAYING:int = 2;
 		public static const GAME_OVER:int = 3;
-		public static const SHOW_SCORES:int = 3;
+		public static const SHOW_SCORES:int = 4;
 		
 		public static var scrollSpeed:Number = 1;
 		
@@ -29,7 +29,8 @@ package
 		private var bird:Bird;
 		private var entities:FlxGroup;
 		private var explosion:FlxSprite;
-		private var scoreboard:FlxSprite;
+		private var currentScore:Scoreboard;
+		private var highScore:Scoreboard;
 		private var spawnTimer:FlxTimer;
 		private var instructionsOverlay:FlxSprite;
 		private var menuOverlay:FlxSprite;
@@ -78,6 +79,7 @@ package
 			instructionsOverlay = new FlxSprite(192, 56);
 			instructionsOverlay.loadGraphic(imgInstructions, true, false, 256, 128);
 			instructionsOverlay.addAnimation("rules", [0, 1], 8, true);
+			instructionsOverlay.addAnimation("score", [2, 3], 1, true);
 			instructionsOverlay.play("rules");
 			add(instructionsOverlay);
 			
@@ -88,8 +90,11 @@ package
 			menuOverlay.play("Get Ready");
 			add(menuOverlay);
 			
-			scoreboard = new Scoreboard();
-			add(scoreboard);
+			currentScore = new Scoreboard(0.5 * FlxG.width - 20, 8);
+			add(currentScore);
+			
+			highScore = new Scoreboard(192 + 10, 56 + 65);
+			add(highScore);
 			
 			spawnTimer = new FlxTimer();
 			gameState = INSTRUCTIONS;
@@ -105,27 +110,33 @@ package
 			var _priorState:int = _gameState;	
 			_gameState = Value;
 			
+			// Default settings, gameState overrides as necessary
+			scrollSpeed = 1;
+			spawnTimer.stop();
+			GameInput.enabled = false;
+			highScore.visible = false;
+			instructionsOverlay.visible = true;
+			menuOverlay.visible = true;
+			
 			if (_gameState == INSTRUCTIONS)
 			{
 				instructionsOverlay.x = FlxG.width;
-				instructionsOverlay.visible = true;
 				menuOverlay.visible = false;
-				scrollSpeed = 1;
-				spawnTimer.stop();
 				bird.respawn();
-				GameInput.enabled = false;
 			}
 			else if (_gameState == GET_READY)
 			{
+				currentScore.score = 0;
+				currentScore.targetScore = 0;
+				currentScore.x = 0.5 * FlxG.width - 20;
+				currentScore.y = 8;
+				currentScore.visible = true;
+				FlxG.score = 0;
 				instructionsOverlay.x = 191;
 				menuOverlay.x = FlxG.width;
 				menuOverlay.play("Get Ready");
-				menuOverlay.visible = true;
-				scrollSpeed = 1;
-				spawnTimer.stop();
 				spawnTimer.start(2, 1, beginPlaying);
 				bird.respawn();
-				GameInput.enabled = false;
 				var _entity:Entity;
 				for (var i:int = 0; i < entities.members.length; i++)
 				{
@@ -136,12 +147,10 @@ package
 			}
 			else if (_gameState == PLAYING)
 			{
-				if (_priorState != PLAYING)
-					FlxG.score = 0;
-				instructionsOverlay.visible = false;
+				currentScore.score = 0;
+				GameInput.mouseLastPos.make(0, 0);
 				menuOverlay.x = 269;
-				scrollSpeed = 1;
-				spawnTimer.stop();
+				instructionsOverlay.visible = false;
 				spawnTimer.start(1, 1, nextObstacle);
 				GameInput.enabled = true;
 			}
@@ -149,24 +158,22 @@ package
 			{
 				if (FlxG.score > UserSettings.bestScore)
 					UserSettings.bestScore = FlxG.score;
-				instructionsOverlay.visible = false;
 				menuOverlay.x = FlxG.width;
 				menuOverlay.play("Game Over");
-				menuOverlay.visible = true;
+				instructionsOverlay.visible = false;
 				scrollSpeed = 0;
-				spawnTimer.stop();
-				GameInput.enabled = false;
+				spawnTimer.start(2, 1, switchToScores);
 			}
 			else if (_gameState == SHOW_SCORES)
 			{
-				if (FlxG.score > UserSettings.bestScore)
-					UserSettings.bestScore = FlxG.score;
-				instructionsOverlay.visible = false;
-				menuOverlay.visible = false;
+				currentScore.visible = false;
+				highScore.visible = false;
+				highScore.score = UserSettings.bestScore;
+				instructionsOverlay.x = FlxG.width;
+				instructionsOverlay.play("score");
+				menuOverlay.x = 269;
 				scrollSpeed = 0;
-				spawnTimer.stop();
-				GameInput.enabled = false;
-				// show the current and high scores
+				spawnTimer.start(1, 1, showScores);
 			}
 		}
 		
@@ -222,6 +229,23 @@ package
 			gameState = PLAYING;
 		}
 		
+		public function switchToScores(Timer:FlxTimer):void
+		{
+			menuOverlay.x = 269;
+			gameState = SHOW_SCORES;
+		}
+		
+		public function showScores(Timer:FlxTimer):void
+		{
+			currentScore.score = 0;
+			currentScore.tallyInterval = 0.1;
+			currentScore.targetScore = FlxG.score;
+			currentScore.visible = true;
+			currentScore.x = 192 + 10;
+			currentScore.y = 56 + 7;
+			highScore.visible = true;
+		}
+		
 		public function nextObstacle(Timer:FlxTimer):void
 		{
 			menuOverlay.visible = false;
@@ -245,6 +269,9 @@ package
 			GameInput.update();
 			super.update();
 			
+			if (gameState == PLAYING)
+				currentScore.score = FlxG.score;
+
 			if (GameInput.action == GameInput.START)
 			{
 				if (gameState == INSTRUCTIONS)
@@ -252,6 +279,8 @@ package
 				else if (gameState == GET_READY) 
 					gameState = PLAYING;
 				else if (gameState == GAME_OVER)
+					gameState = SHOW_SCORES;
+				else if (gameState == SHOW_SCORES)
 					gameState = GET_READY;
 			}
 			

@@ -23,6 +23,9 @@ package
 		public var hitTimer:FlxTimer;
 		
 		private var dying:Boolean = false;
+		private var flipping:Boolean = false;
+		private var timeSinceFirstFlip:Number = 0;
+		private var jumpsInARow:int = 0;
 		
 		public function Bird(X:Number, Y:Number, Explosion:FlxSprite = null)
 		{
@@ -115,6 +118,7 @@ package
 		{
 			alive = false;
 			dying = true;
+			flipping = false;
 			velocity.x = position.x - explosion.x - 0.5 * explosion.width;
 			velocity.y = position.y - explosion.y - 0.5 * explosion.height;
 			angularVelocity = (velocity.x > 0) ? 800 : -800;
@@ -122,11 +126,16 @@ package
 			drag.x = 25;
 			drag.y = 100;
 			play("idle");
+			FlxG.shake(0.01, 0.15);
 		}
 		
 		public function respawn():void
 		{
 			reset(TOP_LANE.x, TOP_LANE.y);
+			jumpsInARow = 0;
+			timeSinceFirstFlip = 0;
+			flipping = false;
+			dying = false;
 			z = 0;
 			lastZ = z;
 			velocityZ = 0;
@@ -146,10 +155,16 @@ package
 		{	
 			super.update();
 			
+			timeSinceFirstFlip += FlxG.elapsed;
 			if (dying)
 			{
 				velocityZ = GameScreen.BIRD_JUMP_SPEED;
 				dying = false;
+			}
+			else if (flipping && angularVelocity < 200 && angle >= 360)
+			{
+				flipping = false;
+				angle = angularVelocity = angularDrag = 0;
 			}
 			
 			if (!alive)
@@ -176,7 +191,22 @@ package
 			offset.y += 24 + 0.5 * _bobAmount + _bobAmount * Math.cos(bob);
 			
 			if (z <= 0 && GameInput.bufferedJump())
+			{
+				if (jumpsInARow == 0)
+					timeSinceFirstFlip = 0;
+				jumpsInARow++;
+				if (jumpsInARow >= 3)
+				{
+					jumpsInARow = 0;
+					if (timeSinceFirstFlip < 2.5)
+					{
+						angularVelocity = 1200;
+						angularDrag = 2000;
+						flipping = true;
+					}
+				}
 				velocityZ += GameScreen.BIRD_JUMP_SPEED;
+			}
 			
 			if (GameInput.action == GameInput.SWITCH_LANE)
 				switchLane();

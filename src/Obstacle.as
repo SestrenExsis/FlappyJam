@@ -120,7 +120,10 @@ package
 			super.update();
 			x -= GameScreen.GROUND_SPEED * GameScreen.scrollSpeed;
 			if (x + width < 0)
+			{
+				scored = true;
 				kill();
+			}
 			else if (x <= 0 && type > 0 && !scored)
 			{
 				FlxG.score += 1;

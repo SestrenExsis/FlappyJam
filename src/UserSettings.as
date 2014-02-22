@@ -10,7 +10,7 @@ package
 		
 		public static function get bestScore():int
 		{
-			if (_loaded) return _save.data.fewestActions;
+			if (_loaded) return _save.data.bestScore;
 			else return _tempBestScore;
 		}
 		

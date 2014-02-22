@@ -8,6 +8,8 @@ package
 		public static var bufferedInput:Array = [-1, -1, -1, -1];
 		public static var bufferPos:int = 0;
 		public static var mouseClicked:int = -1;
+		public static var mouseActive:Boolean = false;
+		public static var mouseLastPos:FlxPoint = new FlxPoint();
 		public static var keyPressed:int = -1;
 		public static var enabled:Boolean = false;
 		
@@ -27,6 +29,7 @@ package
 			action = NONE;
 			mouseClicked = NONE;
 			keyPressed = NONE;
+			mouseActive = (FlxG.mouse.screenX != mouseLastPos.x || FlxG.mouse.screenY != mouseLastPos.y) ? true : false;
 			
 			var _click:Boolean = FlxG.mouse.justPressed();
 			var _jump:Boolean = FlxG.keys.justPressed("SPACE");
@@ -41,7 +44,7 @@ package
 				
 				if (_click)
 					mouseClicked = JUMP;
-				else if (_desiredLane != Bird.currentLane)
+				else if (mouseActive && _desiredLane != Bird.currentLane)
 					mouseClicked = SWITCH_LANE;
 				
 				if (_jump) keyPressed = JUMP;
@@ -59,6 +62,8 @@ package
 			
 			bufferPos = (bufferPos >= bufferedInput.length) ? 0 : bufferPos++;
 			bufferedInput[bufferPos] = action;
+			
+			mouseLastPos.make(FlxG.mouse.screenX, FlxG.mouse.screenY);
 		}
 		
 		public static function bufferedJump():Boolean
