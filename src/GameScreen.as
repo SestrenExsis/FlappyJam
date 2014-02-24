@@ -10,7 +10,7 @@ package
 		[Embed(source="../assets/images/interface.png")] protected var imgInterface:Class;
 		[Embed(source="../assets/images/bird.png")] protected var imgExplosion:Class;
 		
-		public static const SCREEN_OFFSET_Y:Number = 120;
+		public static const SCREEN_OFFSET_Y:Number = 60;
 		
 		public static const BIRD_JUMP_SPEED:Number = 250;
 		public static const SKY_SPEED:Number = 1;
@@ -36,6 +36,7 @@ package
 		private var spawnTimer:FlxTimer;
 		private var instructionsOverlay:FlxSprite;
 		private var menuOverlay:FlxSprite;
+		private var trophy:Trophy;
 		private var hitboxRect:FlxRect;
 		
 		public function GameScreen()
@@ -53,12 +54,12 @@ package
 			
 			FlxG.bgColor = 0xff70c5ce;
 			
-			var _rect:Rectangle = new Rectangle(0, 0, 640, 131);
-			add(new ScrollingSprite(0, 0 + SCREEN_OFFSET_Y, _rect, SKY_SPEED, 0));
-			_rect.setTo(0, 131, 640, 38);
-			add(new ScrollingSprite(0, 131 + SCREEN_OFFSET_Y, _rect, GROUND_SPEED, 0));
-			_rect.setTo(0, 169, 640, 71);
-			add(new ScrollingSprite(0, 169 + SCREEN_OFFSET_Y, _rect, FOREGROUND_SPEED, 0));
+			var _rect:Rectangle = new Rectangle(0, 0, 640, 191);
+			add(new ScrollingSprite(0, 0, _rect, SKY_SPEED, 0));
+			_rect.setTo(0, 191, 640, 38);
+			add(new ScrollingSprite(0, 191, _rect, GROUND_SPEED, 0));
+			_rect.setTo(0, 229, 640, 131);
+			add(new ScrollingSprite(0, 229, _rect, FOREGROUND_SPEED, 0));
 			
 			var _obstacle:Obstacle;
 			entities = new FlxGroup();
@@ -85,6 +86,10 @@ package
 			instructionsOverlay.play("rules");
 			add(instructionsOverlay);
 			
+			trophy = new Trophy(192 + 179, 56 + SCREEN_OFFSET_Y + 30, "bronze");
+			trophy.visible = false;
+			add(trophy);
+			
 			menuOverlay = new FlxSprite(270, 92 + SCREEN_OFFSET_Y);
 			menuOverlay.loadGraphic(imgInterface, true, false, 99, 28);
 			menuOverlay.addAnimation("Game Over", [0]);
@@ -92,7 +97,7 @@ package
 			menuOverlay.play("Get Ready");
 			add(menuOverlay);
 			
-			currentScore = new Scoreboard(0.5 * FlxG.width - 20, 8 + SCREEN_OFFSET_Y);
+			currentScore = new Scoreboard(0.5 * FlxG.width - 40, 8 + SCREEN_OFFSET_Y);
 			add(currentScore);
 			
 			highScore = new Scoreboard(192 + 10, 56 + 65 + SCREEN_OFFSET_Y);
@@ -117,6 +122,7 @@ package
 			spawnTimer.stop();
 			GameInput.enabled = false;
 			highScore.visible = false;
+			trophy.visible = false;
 			instructionsOverlay.visible = true;
 			menuOverlay.visible = true;
 			
@@ -130,7 +136,7 @@ package
 			{
 				currentScore.score = 0;
 				currentScore.targetScore = 0;
-				currentScore.x = 0.5 * FlxG.width - 20;
+				currentScore.x = 0.5 * FlxG.width - 40;
 				currentScore.y = 8 + SCREEN_OFFSET_Y;
 				currentScore.visible = true;
 				FlxG.score = 0;
@@ -240,12 +246,19 @@ package
 		public function showScores(Timer:FlxTimer):void
 		{
 			currentScore.score = 0;
-			currentScore.tallyInterval = 0.1;
+			currentScore.tallyInterval = Math.max(1 / 60, 1 / FlxG.score);
 			currentScore.targetScore = FlxG.score;
 			currentScore.visible = true;
 			currentScore.x = 192 + 10;
 			currentScore.y = 56 + 7 + SCREEN_OFFSET_Y;
 			highScore.visible = true;
+			
+			if (FlxG.score >= 25)
+				trophy.showTrophy("gold");
+			else if (FlxG.score >= 15)
+				trophy.showTrophy("silver");
+			else if (FlxG.score >= 5)
+				trophy.showTrophy("bronze");
 		}
 		
 		public function nextObstacle(Timer:FlxTimer):void
@@ -282,7 +295,7 @@ package
 					gameState = PLAYING;
 				else if (gameState == GAME_OVER)
 					gameState = SHOW_SCORES;
-				else if (gameState == SHOW_SCORES)
+				else if (highScore.visible && gameState == SHOW_SCORES)
 					gameState = GET_READY;
 			}
 			

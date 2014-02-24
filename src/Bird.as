@@ -222,7 +222,10 @@ package
 			var _xx:Number = _flashPoint.x;
 			var _yy:Number = _flashPoint.y;
 			
-			_flashRect.x = 64;
+			if (z > 8)
+				_flashRect.x = 96;
+			else
+				_flashRect.x = 64;
 			_flashRect.y = 0;
 			_flashPoint.x = x - offset.x;
 			_flashPoint.y = y - height;

@@ -20,7 +20,7 @@ package
 		{
 			super(X, Y);
 			
-			loadGraphic(imgBackground, true, false, 640, 240);
+			loadGraphic(imgBackground, true, false, 640, 360);
 			resetFramePixels(SourceRect);
 			
 			scrollPosition = new FlxPoint();
