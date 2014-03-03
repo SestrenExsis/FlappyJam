@@ -22,6 +22,7 @@ package
 			addAnimation("bronze",[1]);
 			addAnimation("silver",[2]);
 			addAnimation("gold",[3]);
+			addAnimation("diamond",[4]);
 			play(Animation);
 		}
 		

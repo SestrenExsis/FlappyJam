@@ -39,6 +39,9 @@ package
 		private var trophy:Trophy;
 		private var hitboxRect:FlxRect;
 		
+		private var trophiesEarned:int = -1;
+		private var startEarningTrophies:Boolean = false;
+		
 		public function GameScreen()
 		{
 			super();
@@ -164,6 +167,18 @@ package
 			}
 			else if (_gameState == GAME_OVER)
 			{
+				GameJoltConnect.instance.addHighScore(FlxG.score);
+				startEarningTrophies = false;
+				
+				if (FlxG.score >= 35)
+					trophiesEarned = 3;
+				else if (FlxG.score >= 25)
+					trophiesEarned = 2;
+				else if (FlxG.score >= 15)
+					trophiesEarned = 1;
+				else if (FlxG.score >= 5)
+					trophiesEarned = 0;
+				
 				if (FlxG.score > UserSettings.bestScore)
 					UserSettings.bestScore = FlxG.score;
 				menuOverlay.x = FlxG.width;
@@ -253,7 +268,9 @@ package
 			currentScore.y = 56 + 7 + SCREEN_OFFSET_Y;
 			highScore.visible = true;
 			
-			if (FlxG.score >= 25)
+			if (FlxG.score >= 35)
+				trophy.showTrophy("diamond");
+			else if (FlxG.score >= 25)
 				trophy.showTrophy("gold");
 			else if (FlxG.score >= 15)
 				trophy.showTrophy("silver");
@@ -283,6 +300,16 @@ package
 		{	
 			GameInput.update();
 			super.update();
+			
+			if (startEarningTrophies && trophiesEarned >= 0)
+			{
+				if (trophiesEarned <= 3)
+					GameJoltConnect.instance.addTrophy(trophiesEarned);
+				
+				trophiesEarned--;
+			}
+			else
+				startEarningTrophies = true;
 			
 			if (gameState == PLAYING)
 				currentScore.score = FlxG.score;

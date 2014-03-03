@@ -32,7 +32,6 @@ package
 				{
 					tallyProgress -= tallyInterval;
 					score++;
-					FlxG.log(score);
 				}
 			}
 		}
